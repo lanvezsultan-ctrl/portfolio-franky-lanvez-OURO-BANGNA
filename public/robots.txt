@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://franky-ouro-bangna.netlify.app/sitemap-index.xml

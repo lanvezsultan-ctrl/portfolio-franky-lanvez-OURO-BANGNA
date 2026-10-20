@@ -1,0 +1,160 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { projects, sites, ui, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+// Images : src/assets/chantiers/<dossier>/*.jpg et src/assets/projets/<slug>/*.jpg
+const all = import.meta.glob<{ default: ImageMetadata }>('../assets/{projets,chantiers}/*/*.{jpg,jpeg,png,webp}', { eager: true });
+const imagesIn = (dir: string) =>
+  Object.entries(all)
+    .filter(([p]) => p.includes(`/${dir}/`))
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+    .map(([, m]) => m.default);
+---
+<section id="work">
+  <div class="container">
+    <div class="section-head row">
+      <div>
+        <span class="eyebrow">{lang === 'fr' ? 'Chantiers sélectionnés' : 'Selected work'}</span>
+        <h2 class="section-title"><span class="typed" data-type>{sites.title[lang]}</span></h2>
+        <p>{sites.intro[lang]}</p>
+      </div>
+      <a class="btn btn-caps" href="https://tesma-solar.com" target="_blank" rel="noopener">tesma-solar.com <Icon name="external" /></a>
+    </div>
+  </div>
+
+  <!-- Carrousel 3D -->
+  <div class="carousel" data-carousel role="region" aria-roledescription="carousel" aria-label={sites.title[lang]}>
+    <ul class="slides">
+      {sites.items.map((s, i) => {
+        const img = imagesIn(`chantiers/${s.folder}`)[0];
+        return (
+          <li class="slide" data-index={i} aria-roledescription="slide" aria-label={`${i + 1} / ${sites.items.length}`}>
+            <button type="button" class="slide-btn" data-goto={i} tabindex="-1" aria-hidden="true">
+              {img && <Image src={img} alt="" widths={[420, 720]} sizes="(min-width: 900px) 460px, 70vw" loading={i < 3 ? 'eager' : 'lazy'} />}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+    <div class="ctrl">
+      <button class="icon-btn" type="button" data-prev aria-label={ui.prev[lang]}><Icon name="arrow" class="flip" /></button>
+      <span class="count mono" data-count-label>01 / {String(sites.items.length).padStart(2, '0')}</span>
+      <button class="icon-btn" type="button" data-next aria-label={ui.next[lang]}><Icon name="arrow" /></button>
+    </div>
+    <div class="caption" aria-live="polite">
+      {sites.items.map((s, i) => (
+        <div class="cap" data-cap={i} hidden={i !== 0}>
+          <p class="mono meta">{s.power} · {s.year} · Lomé</p>
+          <h3>{s.title[lang]}</h3>
+          <button class="link" type="button" data-open={`dlg-site-${s.folder}`} aria-haspopup="dialog">{ui.viewProject[lang]} →</button>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Études & projets techniques : liste numérotée -->
+  <div class="container" id="projects">
+    <div class="section-head studies-head">
+      <span class="eyebrow">{lang === 'fr' ? 'Archive' : 'Archive'}</span>
+      <h2 class="section-title"><span class="typed" data-type>{projects.title[lang]}</span></h2>
+      <p>{projects.intro[lang]}</p>
+    </div>
+    <ol class="archive">
+      {projects.items.map((p, i) => (
+        <li data-reveal style={`--i:${i % 4}`}>
+          <button class="row-btn" type="button" data-open={`dlg-${p.slug}`} aria-haspopup="dialog">
+            <span class="num mono">{String(i + 1).padStart(2, '0')}</span>
+            <span class="body">
+              <span class="title">{p.title[lang]}</span>
+              <span class="sum">{p.summary[lang]}</span>
+              <span class="cat mono">{p.category[lang]}</span>
+              <span class="tags">{p.tags.map((t) => <span class="tag">{t}</span>)}</span>
+            </span>
+            <Icon name="external" class="go" />
+          </button>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  {projects.items.map((p) => {
+    const imgs = imagesIn(`projets/${p.slug}`);
+    return (
+      <dialog id={`dlg-${p.slug}`} aria-labelledby={`t-${p.slug}`}>
+        <div class="dlg">
+          <button class="icon-btn close" type="button" data-close aria-label={ui.close[lang]}><Icon name="close" /></button>
+          <span class="eyebrow">{p.category[lang]}</span>
+          <h3 id={`t-${p.slug}`}>{p.title[lang]}</h3>
+          <dl>{p.details[lang].map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}</dl>
+          <div class="tags">{p.tags.map((t) => <span class="tag">{t}</span>)}</div>
+          <div class="gallery">
+            {imgs.length ? imgs.map((im) => <Image src={im} alt={p.title[lang]} widths={[480, 860]} sizes="(min-width: 800px) 380px, 90vw" quality={70} />)
+              : [0, 1].map(() => <div class="slot"><Icon name="photo" /><span>{ui.photoSoon[lang]}</span></div>)}
+          </div>
+        </div>
+      </dialog>
+    );
+  })}
+
+  {sites.items.map((s) => {
+    const imgs = imagesIn(`chantiers/${s.folder}`);
+    return (
+      <dialog id={`dlg-site-${s.folder}`} aria-labelledby={`t-site-${s.folder}`}>
+        <div class="dlg">
+          <button class="icon-btn close" type="button" data-close aria-label={ui.close[lang]}><Icon name="close" /></button>
+          <span class="eyebrow">{s.power} · {s.year}</span>
+          <h3 id={`t-site-${s.folder}`}>{s.title[lang]}</h3>
+          <div class="gallery">
+            {imgs.map((im, i) => <Image src={im} alt={`${s.title[lang]} — photo ${i + 1}`} widths={[480, 860]} sizes="(min-width: 800px) 380px, 90vw" quality={70} />)}
+          </div>
+        </div>
+      </dialog>
+    );
+  })}
+</section>
+
+<style>
+  /* ---- carrousel ---- */
+  .carousel { position: relative; overflow: hidden; padding-block: 1.5rem; }
+  .slides { list-style: none; margin: 0; padding: 0; position: relative; height: clamp(240px, 42vw, 400px); perspective: 1400px; }
+  .slide { position: absolute; left: 50%; top: 0; width: clamp(240px, 46vw, 520px); height: 100%; margin-left: calc(clamp(240px, 46vw, 520px) / -2);
+    transition: transform 0.7s var(--ease), opacity 0.7s var(--ease), filter 0.7s;
+    transform: translateX(calc(var(--o, 0) * 62%)) translateZ(calc(var(--a, 0) * -180px)) rotateY(calc(var(--o, 0) * -18deg));
+    opacity: calc(1 - var(--a, 0) * 0.28); z-index: calc(20 - var(--a, 0)); filter: saturate(calc(1 - var(--a, 0) * 0.35)); }
+  .slide[data-far] { opacity: 0; pointer-events: none; }
+  .slide-btn { display: block; width: 100%; height: 100%; padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer;
+    background: var(--surface); box-shadow: var(--shadow); }
+  .slide-btn :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .slide:global(.current) .slide-btn { cursor: default; box-shadow: 0 30px 60px -25px rgb(0 0 0 / 0.45); }
+  .ctrl { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.4rem; }
+  .count { font-size: 0.75rem; color: var(--muted); min-width: 4.5em; text-align: center; }
+  :global(.flip) { transform: scaleX(-1); }
+  .caption { text-align: center; margin-top: 1.2rem; padding-inline: 1rem; min-height: 7.5rem; }
+  .meta { font-size: 0.7rem; letter-spacing: 0.15em; color: var(--muted); margin: 0 0 0.4rem; text-transform: uppercase; }
+  .cap h3 { font-size: clamp(1.15rem, 1rem + 0.9vw, 1.6rem); max-width: 30ch; margin-inline: auto; }
+  .link { margin-top: 0.8rem; background: none; border: 0; border-bottom: 1px solid currentColor; padding: 0.2rem 0; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+
+  /* sans JavaScript : simple rangée défilante */
+  :global(html:not(.js)) .slides { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-inline: 1rem; perspective: none; }
+  :global(html:not(.js)) .slide { position: static; flex: none; margin: 0; transform: none; scroll-snap-align: center; }
+  :global(html:not(.js)) .ctrl { display: none; }
+
+  /* ---- archive ---- */
+  .studies-head { margin-top: clamp(5rem, 10vw, 8rem); }
+  .archive { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .archive li { border-bottom: 1px solid var(--line); }
+  .row-btn { width: 100%; display: grid; grid-template-columns: 2.5rem 1fr auto; gap: 1rem; align-items: start; text-align: left;
+    padding: 1.3rem 0.4rem; background: none; border: 0; cursor: pointer; transition: background-color 0.3s, padding 0.4s var(--ease); border-radius: 10px; }
+  .row-btn:hover { background: var(--surface); padding-inline: 1rem; }
+  .num { font-size: 0.75rem; color: var(--muted); padding-top: 0.2rem; }
+  .body { display: grid; gap: 0.3rem; }
+  .title { font-weight: 700; font-size: 1.02rem; letter-spacing: -0.01em; }
+  .sum { color: var(--muted); font-size: 0.9rem; }
+  .cat { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+  .body .tags { margin-top: 0.3rem; }
+  :global(.go) { width: 18px; height: 18px; color: var(--muted); margin-top: 0.2rem; }
+</style>

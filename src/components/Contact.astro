@@ -1,0 +1,106 @@
+---
+import { contact, contactSection as c, site, ui, footer, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const f = c.form;
+const endpoint = contact.formspreeId ? `https://formspree.io/f/${contact.formspreeId}` : '';
+const cards = [
+  { icon: 'mail', label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
+  { icon: 'phone', label: lang === 'fr' ? 'Téléphone' : 'Phone', value: contact.phones.join(' / '), href: `tel:${contact.phones[0].replace(/\s/g, '')}` },
+  { icon: 'whatsapp', label: 'WhatsApp', value: contact.phones[0], href: `https://wa.me/${contact.whatsapp}` },
+  { icon: 'linkedin', label: 'LinkedIn', value: 'linkedin.com/in/franky-lanvez-ouro-bangna', href: contact.linkedin },
+];
+---
+<section id="contact">
+  <div class="container grid">
+    <div class="left">
+      <span class="eyebrow">{lang === 'fr' ? 'Prenons contact' : 'Get in touch'}</span>
+      <h2 class="giant" data-reveal>{c.title[lang]}</h2>
+      <p class="hook" data-reveal>{c.hook[lang]}</p>
+      <p class="intro" data-reveal>{c.intro[lang]}</p>
+      <a class="btn btn-solid btn-caps" href={site.cvFile} download data-reveal>{ui.downloadCv[lang]} →</a>
+    </div>
+    <div class="right">
+      <ul class="cards">
+        {cards.map((k, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <a class="ccard" href={k.href} target={k.href.startsWith('http') ? '_blank' : undefined} rel={k.href.startsWith('http') ? 'noopener' : undefined}>
+              <span class="ico"><Icon name={k.icon} /></span>
+              <span class="txt"><span class="mono lab">{k.label}</span><span class="val">{k.value}</span></span>
+              <span class="mono n">{String(i + 1).padStart(2, '0')}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="loc mono"><Icon name="pin" />{contact.location}</p>
+      <button class="btn btn-caps send" type="button" data-open="dlg-contact" aria-haspopup="dialog">{ui.sendMessage[lang]} →</button>
+    </div>
+  </div>
+
+  <dialog id="dlg-contact" aria-labelledby="t-contact">
+    <div class="dlg">
+      <button class="icon-btn close" type="button" data-close aria-label={ui.close[lang]}><Icon name="close" /></button>
+      <span class="eyebrow">Contact</span>
+      <h3 id="t-contact">{ui.sendMessage[lang]}</h3>
+      <form class="form" data-contact-form data-endpoint={endpoint} data-to={contact.email}
+        data-sent={f.sent[lang]} data-error={f.error[lang]} data-mailto={f.mailtoNote[lang]}
+        action={endpoint || `mailto:${contact.email}`} method="post">
+        <div class="two">
+          <label><span>{f.name[lang]}</span><input name="name" autocomplete="name" required /></label>
+          <label><span>{f.email[lang]}</span><input name="email" type="email" autocomplete="email" required /></label>
+        </div>
+        <label><span>{f.subject[lang]}</span><input name="subject" /></label>
+        <label><span>{f.message[lang]}</span><textarea name="message" rows="5" required></textarea></label>
+        <button class="btn btn-solid btn-caps" type="submit">{f.send[lang]} →</button>
+        <p class="status" data-status role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </dialog>
+</section>
+
+<footer class="footer">
+  <div class="container foot">
+    <p>© {new Date().getFullYear()} {site.name} · {contact.location}</p>
+    <p class="eco">{footer.text[lang]}</p>
+    <a href="#top">↑ {ui.backToTop[lang]}</a>
+  </div>
+</footer>
+
+<style>
+  .grid { display: grid; gap: 2.5rem; align-items: center; }
+  .left { min-width: 0; }
+  .giant { font-size: clamp(2.3rem, 0.6rem + 5.2vw, 5.4rem); line-height: 0.92; letter-spacing: -0.045em; text-transform: uppercase; font-weight: 800; max-width: 8ch; margin-bottom: 1.6rem; }
+  .hook { font-weight: 700; font-size: 1.15rem; margin-bottom: 0.6rem; max-width: 26ch; }
+  .intro { color: var(--muted); max-width: 46ch; margin-bottom: 1.8rem; }
+  .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.8rem; }
+  .ccard { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; padding: 1rem 1.1rem; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); text-decoration: none;
+    transition: transform 0.35s var(--ease), border-color 0.3s; }
+  .ccard:hover { transform: translateX(4px); border-color: var(--line-strong); }
+  .ico { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+  .ico :global(svg) { width: 18px; height: 18px; }
+  .txt { display: grid; min-width: 0; }
+  .lab { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .val { font-weight: 600; font-size: 0.88rem; overflow-wrap: anywhere; }
+  .n { align-self: start; font-size: 0.65rem; color: var(--muted); }
+  .loc { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; font-size: 0.75rem; color: var(--muted); }
+  .loc :global(svg) { width: 16px; color: var(--accent); }
+  .send { width: 100%; min-height: 54px; }
+  @media (min-width: 960px) { .grid { grid-template-columns: 1.15fr 1fr; gap: 4rem; } }
+
+  .form { display: grid; gap: 1rem; }
+  .two { display: grid; gap: 1rem; }
+  @media (min-width: 640px) { .two { grid-template-columns: 1fr 1fr; } }
+  label { display: grid; gap: 0.35rem; font-size: 0.8rem; color: var(--muted); }
+  input, textarea { width: 100%; font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 0.75rem 0.9rem; min-height: 46px; }
+  input:focus, textarea:focus { outline: none; border-color: var(--line-strong); }
+  .form .btn { justify-self: start; }
+  .status { margin: 0; min-height: 1.4em; color: var(--accent); font-size: 0.88rem; }
+
+  .footer { border-top: 1px solid var(--line); padding-block: 1.8rem; }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem 2rem; font-size: 0.78rem; color: var(--muted); }
+  .foot p { margin: 0; }
+  .foot a { color: var(--text); text-decoration: none; }
+  .eco { max-width: 60ch; }
+</style>

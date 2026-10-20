@@ -1,0 +1,72 @@
+---
+import { skills, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section id="skills">
+  <div class="container layout">
+    <div class="left">
+      <span class="eyebrow">{lang === 'fr' ? 'Mes capacités' : 'My capabilities'}</span>
+      <h2 class="section-title"><span class="typed" data-type>{skills.title[lang]}</span></h2>
+      <p class="intro">{skills.intro[lang]}</p>
+      <ul class="tools" aria-label={lang === 'fr' ? 'Marques et outils maîtrisés' : 'Brands and tools'}>
+        {skills.tools.map((t, i) => <li data-reveal style={`--i:${i % 4}`}><span>{t}</span></li>)}
+      </ul>
+
+      <div class="langs" data-reveal>
+        <span class="eyebrow">{skills.languagesTitle[lang]}</span>
+        <ul>
+          {skills.languages.map((l) => <li><strong>{l.name[lang]}</strong><span class="mono">{l.level[lang]}</span></li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div class="cards">
+      {skills.groups.map((g, i) => (
+        <article class="card lift" data-reveal style={`--i:${i % 2}`}>
+          <header>
+            <span class="n">{String(i + 1).padStart(2, '0')}</span>
+            <span class="label mono">{g.title[lang]}</span>
+          </header>
+          <span class="ico"><Icon name={g.icon} /></span>
+          <p>{g.text[lang]}</p>
+          <ul class="tags">{g.tags.map((t) => <li class="tag">{t}</li>)}</ul>
+        </article>
+      ))}
+      <article class="card software" data-reveal>
+        <span class="eyebrow">{skills.softwareTitle[lang]}</span>
+        <ul class="tags">{skills.software.map((s) => <li class="tag">{s}</li>)}</ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .layout { display: grid; gap: 2.5rem; }
+  .layout > * { min-width: 0; }
+  .intro { color: var(--muted); max-width: 46ch; }
+  .tools { list-style: none; padding: 0; margin: 1.8rem 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; max-width: 380px; }
+  .tools li { aspect-ratio: 1; display: grid; place-items: center; text-align: center; padding: 0.3rem; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); transition: transform 0.35s var(--ease); }
+  .tools li:hover { transform: translateY(-3px) rotate(-2deg); }
+  .tools span { font-size: 0.62rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+  .langs { margin-top: 2rem; max-width: 380px; }
+  .langs ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+  .langs li { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.88rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--line); }
+  .langs .mono { font-size: 0.72rem; color: var(--muted); }
+
+  .cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); align-content: start; }
+  .card header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem; }
+  .n { font-size: 2rem; font-weight: 300; letter-spacing: -0.03em; line-height: 1; }
+  .label { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; color: var(--muted); max-width: 14ch; }
+  .ico { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 10px; margin: 0 auto 1rem; background: var(--invert); color: var(--invert-text); }
+  .ico :global(svg) { width: 22px; height: 22px; }
+  .card p { color: var(--muted); font-size: 0.88rem; }
+  .software { grid-column: 1 / -1; }
+
+  @media (min-width: 960px) {
+    .layout { grid-template-columns: 0.9fr 1.1fr; gap: 3.5rem; }
+    .left { position: sticky; top: 6.5rem; align-self: start; }
+  }
+</style>

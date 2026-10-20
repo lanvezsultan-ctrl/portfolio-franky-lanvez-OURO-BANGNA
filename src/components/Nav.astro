@@ -1,0 +1,84 @@
+---
+import { ui, site, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+import { withBase } from '../lib/url';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const links = [
+  ['#work', ui.nav.work],
+  ['#skills', ui.nav.skills],
+  ['#about', ui.nav.about],
+  ['#education', ui.nav.journey],
+  ['#experience', ui.nav.experience],
+  ['#tesma', ui.nav.tesma],
+] as const;
+const otherLang = lang === 'fr' ? 'en' : 'fr';
+const otherHref = withBase(lang === 'fr' ? '/en/' : '/');
+---
+<header class="nav-wrap">
+  <nav class="nav" aria-label={lang === 'fr' ? 'Navigation principale' : 'Main navigation'}>
+    <a class="brand" href="#top" aria-label={site.name}>
+      <span class="logo" aria-hidden="true">F</span>
+      <span class="brand-name">FRANKY</span>
+    </a>
+    <ul class="nav-links">
+      {links.map(([href, label]) => <li><a href={href} data-spy={href.slice(1)}>{label[lang]}</a></li>)}
+    </ul>
+    <div class="nav-actions">
+      <a class="lang" href={otherHref} hreflang={otherLang} lang={otherLang}
+        aria-label={lang === 'fr' ? 'English version' : 'Version française'}>{otherLang.toUpperCase()}</a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label={ui.themeToggle[lang]}>
+        <Icon name="sun" class="i-sun" /><Icon name="moon" class="i-moon" />
+      </button>
+      <a class="btn hire" href="#contact">{ui.hire[lang]}</a>
+      <button class="icon-btn burger" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label={ui.menu[lang]}>
+        <Icon name="menu" />
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div id="mobile-menu" class="mobile-menu">
+  <ul>
+    {[...links, ['#contact', ui.nav.contact] as const].map(([href, label], i) => <li style={`--i:${i}`}><a href={href}>{label[lang]}</a></li>)}
+  </ul>
+</div>
+
+<style>
+  .nav-wrap { position: fixed; top: 0.8rem; left: 0; right: 0; z-index: 100; padding-inline: 1rem; }
+  .nav {
+    max-width: 920px; margin-inline: auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.45rem 0.5rem 0.45rem 0.6rem; border-radius: 14px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+  .logo { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; background: var(--invert); color: var(--invert-text);
+    font-weight: 800; font-size: 1rem; font-style: italic; }
+  .brand-name { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; }
+  .nav-links { display: none; list-style: none; margin: 0; padding: 0; gap: 0.1rem; }
+  .nav-links a { position: relative; display: block; white-space: nowrap; padding: 0.5rem 0.7rem; text-decoration: none; font-size: 0.66rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); transition: color 0.25s; }
+  .nav-links a::after { content: ''; position: absolute; left: 0.7rem; right: 0.7rem; bottom: 0.3rem; height: 1.5px; background: currentColor;
+    transform: scaleX(0); transform-origin: left; transition: transform 0.35s var(--ease); }
+  .nav-links a:hover, .nav-links a:global(.active) { color: var(--text); }
+  .nav-links a:hover::after, .nav-links a:global(.active)::after { transform: none; }
+  .nav-actions { display: flex; align-items: center; gap: 0.35rem; }
+  :global([data-theme='light'] .i-moon), :global([data-theme='dark'] .i-sun) { display: none; }
+  .lang { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+    text-decoration: none; border: 1px solid var(--line); }
+  .lang:hover { background: var(--surface-2); }
+  .hire { display: none; min-height: 40px; padding: 0.45rem 1.1rem; font-size: 0.78rem; white-space: nowrap; }
+  @media (min-width: 640px) { .hire { display: inline-flex; } }
+  @media (min-width: 1080px) { .nav-links { display: flex; } .burger { display: none; } .nav { max-width: 1040px; } }
+
+  .mobile-menu { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; background: var(--bg);
+    opacity: 0; visibility: hidden; transition: opacity 0.4s var(--ease), visibility 0.4s; }
+  .mobile-menu[data-open] { opacity: 1; visibility: visible; }
+  .mobile-menu ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; text-align: center; }
+  .mobile-menu a { font-size: clamp(1.8rem, 8vw, 2.6rem); font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
+  .mobile-menu li { opacity: 0; transform: translateY(14px); transition: 0.5s var(--ease); transition-delay: calc(var(--i) * 45ms); }
+  .mobile-menu[data-open] li { opacity: 1; transform: none; }
+</style>

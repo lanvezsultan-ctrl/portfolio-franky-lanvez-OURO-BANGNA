@@ -1,0 +1,16 @@
+# dépendances et build
+node_modules/
+dist/
+.astro/
+
+# photos originales (confidentielles) — seules les versions préparées dans src/assets/photos sont publiées
+photos/
+
+# captures des vidéos de référence (contenu de tiers, ne pas publier)
+reference_frames/
+
+# divers
+.DS_Store
+Thumbs.db
+*.log
+.env

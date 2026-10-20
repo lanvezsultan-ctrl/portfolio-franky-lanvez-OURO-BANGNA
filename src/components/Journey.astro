@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { education, experience, teaching, ui, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const all = import.meta.glob<{ default: ImageMetadata }>('../assets/{projets,chantiers}/*/*.{jpg,jpeg,png,webp}', { eager: true });
+const img = (rel: string) => (rel ? all[`../assets/${rel}`]?.default : undefined);
+// collage « sur le terrain » (photos de chantiers TESMA)
+const collage = ['chantiers/zossime-22kva/2.jpg', 'chantiers/egghome-12kva/1.jpg', 'chantiers/mokpokpo-15kva/3.jpg',
+  'chantiers/pompage-irrigation/1.jpg', 'chantiers/villa-sagbado/2.jpg', 'chantiers/maison-6kva/1.jpg'].map(img).filter(Boolean) as ImageMetadata[];
+---
+<section id="education">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">{lang === 'fr' ? 'Diplômes' : 'Degrees'}</span>
+      <h2 class="section-title"><span class="typed" data-type>{education.title[lang]}</span></h2>
+      <p>{lang === 'fr' ? 'Une formation technique solide, du CAP à l’ingénierie, toujours ancrée dans le terrain.' : 'Solid technical training, from vocational certificate to engineering, always grounded in the field.'}</p>
+    </div>
+    <div class="edu">
+      <div class="collage" data-reveal>
+        {collage.map((c, i) => <Image src={c} alt={lang === 'fr' ? 'Chantier TESMA' : 'TESMA site'} widths={[220, 360]} sizes="(min-width: 900px) 180px, 30vw" quality={65} class={`c${i}`} />)}
+      </div>
+      <ul class="degrees">
+        {education.items.map((it, i) => (
+          <li class="card lift" data-reveal style={`--i:${i}`}>
+            <span class="di"><Icon name={i === 0 ? 'book' : 'helmet'} /></span>
+            <span class="dt">
+              <strong>{it.title[lang]}</strong>
+              <small>{it.school[lang]}</small>
+            </span>
+            <span class="year mono">{it.year[lang]}</span>
+          </li>
+        ))}
+        {education.certifications.length === 0 && (
+          <li class="todo"><span class="todo-badge">TODO</span> {lang === 'fr' ? 'Certifications à ajouter' : 'Certifications to add'}</li>
+        )}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">{lang === 'fr' ? 'Parcours professionnel' : 'Career'}</span>
+      <h2 class="section-title"><span class="typed" data-type>{experience.title[lang]}</span></h2>
+    </div>
+    <ol class="rows">
+      {experience.items.map((it, i) => {
+        const photo = img(it.photo);
+        const isTeaching = it.org.startsWith('CMET');
+        return (
+          <li class:list={['row', { rev: i % 2 === 1 }]} id={isTeaching ? 'teaching' : undefined} data-reveal>
+            <div class="media">
+              {photo ? <Image src={photo} alt={`${it.org} — ${it.role[lang]}`} widths={[480, 820]} sizes="(min-width: 900px) 460px, 92vw" quality={70} />
+                : <div class="slot"><Icon name="photo" /><span>{ui.photoSoon[lang]}</span></div>}
+            </div>
+            <div class="text">
+              <div class="top">
+                <h3>{it.role[lang]}</h3>
+                <span class="date mono">{it.period[lang]}</span>
+              </div>
+              <p class="org">{it.org}</p>
+              {isTeaching && <p class="teach-intro">{teaching.text[lang]}</p>}
+              <ul class="bullets">{it.bullets[lang].map((b) => <li>{b}</li>)}</ul>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .edu { display: grid; gap: 2rem; align-items: center; }
+  .collage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+  .collage :global(img) { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow);
+    transition: transform 0.5s var(--ease); }
+  .collage :global(img:nth-child(odd)) { transform: rotate(-1.5deg); }
+  .collage :global(img:nth-child(even)) { transform: rotate(1.5deg) translateY(10px); }
+  .collage :global(img:hover) { transform: scale(1.04); z-index: 2; }
+  .degrees { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.7rem; }
+  .degrees li { display: grid; grid-template-columns: auto 1fr auto; gap: 0.9rem; align-items: center; padding: 0.9rem 1rem; }
+  .di { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface-2); }
+  .di :global(svg) { width: 18px; height: 18px; }
+  .dt strong { display: block; font-size: 0.9rem; line-height: 1.3; }
+  .dt small { color: var(--muted); font-size: 0.78rem; }
+  .year { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+  .todo { color: var(--muted); font-size: 0.85rem; padding: 0.4rem 0.2rem; }
+  @media (min-width: 900px) { .edu { grid-template-columns: 1.1fr 1fr; gap: 3rem; } }
+
+  .rows { list-style: none; padding: 0; margin: 0; display: grid; gap: clamp(3rem, 6vw, 4.5rem); }
+  .row { display: grid; gap: 1.5rem; align-items: center; }
+  .media { border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 10; box-shadow: var(--shadow); }
+  .media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .media .slot { border-radius: 12px; }
+  .top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem 1rem; align-items: baseline; }
+  .text h3 { font-size: 1.15rem; letter-spacing: -0.015em; }
+  .date { font-size: 0.72rem; color: var(--muted); }
+  .org { margin: 0.3rem 0 0.8rem; font-weight: 600; font-size: 0.85rem; }
+  .teach-intro { color: var(--muted); font-size: 0.9rem; }
+  .bullets { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; color: var(--muted); font-size: 0.9rem; }
+  .bullets li::marker { color: var(--accent); }
+  @media (min-width: 900px) {
+    .row { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .row.rev .media { order: 2; }
+  }
+</style>

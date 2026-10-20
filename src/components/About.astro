@@ -1,0 +1,114 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { about, hero, site, impact, ui, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const found = import.meta.glob<{ default: ImageMetadata }>('../assets/photos/{avatar,profil}.{png,webp,jpg,jpeg}', { eager: true });
+const avatar = Object.values(found)[0]?.default;
+const icons = ['helmet', 'book', 'chip'];
+---
+<section id="about">
+  <div class="container">
+    <span class="eyebrow">{lang === 'fr' ? 'À propos de moi' : 'About me'}</span>
+    <h2 class="headline"><span class="typed" data-type>{about.headline[lang]}</span></h2>
+
+    <div class="grid">
+      <div class="main">
+        <div class="id" data-reveal>
+          <div class="avatar">
+            {avatar ? <Picture src={avatar} alt={hero.photoAlt[lang]} widths={[96, 192]} sizes="96px" formats={['avif', 'webp']} />
+              : <svg viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="38" r="16" /><path d="M16 92c3-20 16-30 32-30s29 10 32 30" /></svg>}
+          </div>
+          <div>
+            <p class="name">{site.name.toUpperCase()} <span class="verified" title="TESMA"><Icon name="leaf" /></span></p>
+            <ul class="stats">
+              {about.stats.map((s) => <li><span class="mono k">{s.label[lang]}</span><strong>{s.value}</strong></li>)}
+            </ul>
+          </div>
+        </div>
+        {about.paragraphs[lang].map((p, i) => <p class="para" data-reveal style={`--i:${i}`}>{p}</p>)}
+        <p class="para" data-reveal>
+          {lang === 'fr' ? 'Envie d’en savoir plus sur mon parcours ? ' : 'Want to know more about my experience? '}
+          <a href={site.cvFile} download class="dl">{ui.downloadCv[lang]}</a>.
+        </p>
+
+        <div class="currently" data-reveal>
+          <span class="eyebrow">{lang === 'fr' ? 'Actuellement' : 'Currently'}</span>
+          <ul>
+            {about.currently.map((c, i) => (
+              <li><span class="ci"><Icon name={icons[i]} /></span><span><strong>{c.title[lang]}</strong><small>{c.sub[lang]}</small></span></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- cartes « trait » empilées qui tournent -->
+      <div class="traits" data-traits aria-label="Soft skills">
+        {about.softSkills[lang].map((s, i) => (
+          <div class="trait" style={`--k:${i}`}><span class="mono">{lang === 'fr' ? 'Qualité' : 'Trait'}</span><strong>{s}</strong></div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Impact -->
+    <div class="impact" id="impact">
+      <span class="eyebrow">{impact.title[lang]}</span>
+      <ul class="counters">
+        {impact.counters.map((c, i) => (
+          <li class="card" data-reveal style={`--i:${i}`}>
+            <p class="num"><span data-count={c.value}>{c.value.toLocaleString(lang)}</span><span class="suffix">{c.suffix}</span></p>
+            <p class="lbl">{c.label[lang]}</p>
+            {c.todo && <span class="todo-badge">TODO · {ui.todo[lang]}</span>}
+          </li>
+        ))}
+      </ul>
+      <p class="impact-note">{impact.intro[lang]}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .headline { font-size: clamp(2rem, 1.2rem + 3.6vw, 3.8rem); margin-bottom: 2.5rem; max-width: 20ch; }
+  .grid { display: grid; gap: 2.5rem; }
+  .id { display: flex; gap: 1.2rem; align-items: center; margin-bottom: 1.6rem; }
+  .avatar { flex: none; width: 84px; height: 84px; border-radius: 50%; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+  .avatar :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; transform: scale(1.6); transform-origin: 50% 20%; }
+  .avatar svg { fill: var(--muted); }
+  .name { margin: 0 0 0.6rem; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em; display: flex; align-items: center; gap: 0.4rem; }
+  .verified { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; }
+  .verified :global(svg) { width: 11px; height: 11px; }
+  .stats { list-style: none; padding: 0; margin: 0; display: flex; gap: 1.6rem; }
+  .stats li { display: grid; }
+  .k { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .stats strong { font-size: 1.15rem; }
+  .para { color: var(--muted); max-width: 70ch; }
+  .dl { color: var(--text); font-weight: 600; }
+  .currently { margin-top: 2rem; }
+  .currently ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 1.2rem 2rem; }
+  .currently li { display: flex; gap: 0.6rem; align-items: center; }
+  .ci { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); }
+  .ci :global(svg) { width: 17px; height: 17px; }
+  .currently strong { display: block; font-size: 0.85rem; }
+  .currently small { color: var(--muted); font-size: 0.75rem; }
+
+  .traits { position: relative; height: 170px; width: min(100%, 260px); justify-self: center; align-self: end; }
+  .trait { position: absolute; inset: 0; display: grid; align-content: space-between; padding: 1.2rem; border-radius: 14px;
+    background: var(--invert); color: var(--invert-text); box-shadow: var(--shadow);
+    transform: rotate(calc(var(--d, var(--k)) * -4deg)) translate(calc(var(--d, var(--k)) * 6px), calc(var(--d, var(--k)) * -6px));
+    opacity: calc(1 - var(--d, var(--k)) * 0.25); z-index: calc(30 - var(--d, var(--k)));
+    transition: transform 0.7s var(--ease), opacity 0.7s; }
+  .trait .mono { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.7; }
+  .trait strong { font-size: 1.3rem; letter-spacing: -0.01em; }
+
+  .impact { margin-top: clamp(4rem, 8vw, 6rem); }
+  .counters { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+  .counters li { padding-block: 1.6rem; }
+  .num { margin: 0; font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem); font-weight: 700; letter-spacing: -0.04em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .suffix { font-size: 0.5em; margin-left: 0.15em; color: var(--accent); }
+  .lbl { margin: 0.1rem 0 0.7rem; color: var(--muted); font-size: 0.9rem; }
+  .impact-note { margin-top: 1rem; color: var(--muted); font-size: 0.85rem; }
+
+  @media (min-width: 960px) { .grid { grid-template-columns: 1fr 280px; gap: 3rem; } }
+</style>

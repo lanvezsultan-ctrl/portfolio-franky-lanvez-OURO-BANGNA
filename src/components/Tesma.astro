@@ -1,0 +1,50 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/tesma-logo.png';
+import { tesma, type Lang } from '../content/content';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section id="tesma">
+  <div class="container">
+    <div class="panel card" data-reveal>
+      <div class="head">
+        <div class="logo"><Image src={logo} alt="Logo TESMA" width={120} /></div>
+        <div>
+          <span class="eyebrow">{lang === 'fr' ? 'Mon entreprise' : 'My company'}</span>
+          <h2 class="section-title">TESMA</h2>
+          <p class="full mono">{tesma.fullName[lang]}</p>
+        </div>
+      </div>
+      <p class="text">{tesma.text[lang]}</p>
+      <ol class="services">
+        {tesma.services[lang].map((s, i) => <li><span class="mono">{String(i + 1).padStart(2, '0')}</span>{s}</li>)}
+      </ol>
+      <div class="foot">
+        <p class="hq"><Icon name="pin" />{tesma.hq[lang]}</p>
+        <div class="links">
+          <a class="btn btn-solid btn-caps" href={tesma.website} target="_blank" rel="noopener">{tesma.visit[lang]} <Icon name="external" /></a>
+          {tesma.socials.map((s) => <a class="btn btn-caps small" href={s.url} target="_blank" rel="noopener">{s.label}</a>)}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .panel { padding: clamp(1.5rem, 5vw, 3rem); }
+  .head { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; }
+  .logo { width: 96px; padding: 8px; border-radius: 18px; background: #fff; border: 1px solid var(--line); }
+  .section-title { margin: 0 0 0.2rem; }
+  .full { margin: 0; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.04em; }
+  .text { margin: 1.6rem 0; max-width: 68ch; color: var(--muted); }
+  .services { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); border-top: 1px solid var(--line); }
+  .services li { display: flex; gap: 0.8rem; align-items: baseline; padding: 0.8rem 0.2rem; border-bottom: 1px solid var(--line); font-size: 0.92rem; }
+  .services .mono { font-size: 0.7rem; color: var(--muted); }
+  .foot { margin-top: 2rem; display: grid; gap: 1.2rem; }
+  .hq { display: flex; gap: 0.5rem; align-items: center; margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .hq :global(svg) { width: 18px; color: var(--accent); }
+  .links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .small { min-height: 42px; padding: 0.45rem 1rem; }
+</style>

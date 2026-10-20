@@ -1,0 +1,68 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '../styles/global.css';
+import { meta, site, ui, type Lang } from '../content/content';
+import { withBase } from '../lib/url';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const title = meta.title[lang];
+const description = meta.description[lang];
+// adresse publique = `site` + `base` dans astro.config.mjs
+const abs = (p: string) => new URL(withBase(p), Astro.site ?? site.url).href;
+const canonical = abs(lang === 'fr' ? '/' : '/en/');
+const ogImage = abs('/og-image.jpg');
+---
+<!doctype html>
+<html lang={lang} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="fr" href={abs('/')} />
+    <link rel="alternate" hreflang="en" href={abs('/en/')} />
+    <link rel="alternate" hreflang="x-default" href={abs('/')} />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+    <meta name="theme-color" content="#E9E9E7" />
+    <meta name="author" content={site.name} />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: site.name,
+      jobTitle: lang === 'fr' ? 'Fondateur & Conducteur des Travaux, TESMA' : 'Founder & Works Manager, TESMA',
+      address: { '@type': 'PostalAddress', addressLocality: 'Lomé', addressCountry: 'TG' },
+      worksFor: { '@type': 'Organization', name: 'TESMA', url: 'https://tesma-solar.com' },
+      url: canonical,
+    })} />
+
+    <!-- thème clair par défaut ; le choix de l'internaute est mémorisé -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        var t = null;
+        try { t = localStorage.getItem('theme'); } catch (e) {}
+        d.dataset.theme = t === 'dark' ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{ui.skipLink[lang]}</a>
+    <slot />
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>

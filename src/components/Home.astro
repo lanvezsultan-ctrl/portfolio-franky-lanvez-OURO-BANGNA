@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from './Nav.astro';
+import Hero from './Hero.astro';
+import Work from './Work.astro';
+import Skills from './Skills.astro';
+import About from './About.astro';
+import Journey from './Journey.astro';
+import Tesma from './Tesma.astro';
+import Contact from './Contact.astro';
+import type { Lang } from '../content/content';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<Base lang={lang}>
+  <Nav lang={lang} />
+  <main id="main">
+    <Hero lang={lang} />
+    <Work lang={lang} />
+    <Skills lang={lang} />
+    <About lang={lang} />
+    <Journey lang={lang} />
+    <Tesma lang={lang} />
+  </main>
+  <Contact lang={lang} />
+</Base>
