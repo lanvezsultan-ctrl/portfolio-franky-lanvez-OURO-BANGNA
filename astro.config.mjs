@@ -3,10 +3,10 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  // GitHub Pages : https://<pseudo>.github.io/portfolio
+  // GitHub Pages : https://lanvezsultan-ctrl.github.io/portfolio-franky-lanvez-OURO-BANGNA/
   // Avec un nom de domaine : site: 'https://mondomaine.com' et supprimer la ligne `base`.
-  site: 'https://PSEUDO-GITHUB.github.io', // TODO : remplacer PSEUDO-GITHUB par le pseudo GitHub
-  base: '/portfolio',
+  site: 'https://lanvezsultan-ctrl.github.io',
+  base: '/portfolio-franky-lanvez-OURO-BANGNA',
   output: 'static',
   i18n: {
     defaultLocale: 'fr',

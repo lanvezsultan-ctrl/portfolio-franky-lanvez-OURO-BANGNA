@@ -15,7 +15,7 @@ export type L = { fr: string; en: string };
 /* ---------- Identité & contacts ---------- */
 export const site = {
   // TODO : remplacer par le nom de domaine définitif (sert au sitemap et à l'Open Graph)
-  url: 'https://franky-ouro-bangna.netlify.app',
+  url: 'https://lanvezsultan-ctrl.github.io/portfolio-franky-lanvez-OURO-BANGNA',
   name: 'Franky Lanvez OURO-BANGNA',
   shortName: 'Franky',
   city: 'Lomé, Togo',

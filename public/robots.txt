@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://franky-ouro-bangna.netlify.app/sitemap-index.xml
+Sitemap: https://lanvezsultan-ctrl.github.io/portfolio-franky-lanvez-OURO-BANGNA/sitemap-index.xml
