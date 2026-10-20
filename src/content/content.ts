@@ -108,7 +108,7 @@ export const about = {
   headline: { fr: 'Conducteur des travaux. Ingénieur solaire.', en: 'Works Manager. Solar Engineer.' },
   stats: [
     { value: '5', label: { fr: 'Expériences', en: 'Positions' } },
-    { value: '13+', label: { fr: 'Chantiers présentés', en: 'Sites showcased' } },
+    { value: '35+', label: { fr: 'Chantiers réalisés', en: 'Sites delivered' } },
     { value: '2024', label: { fr: 'Licence pro EPL', en: 'BSc EPL' } },
   ],
   currently: [
@@ -538,7 +538,7 @@ export const impact = {
   },
   counters: [
     { value: 250, suffix: ' kWc', label: { fr: 'installés', en: 'installed' }, todo: true },
-    { value: 13, suffix: '+', label: { fr: 'chantiers présentés', en: 'sites showcased' }, todo: false },
+    { value: 35, suffix: '+', label: { fr: 'chantiers réalisés', en: 'sites delivered' }, todo: false },
     { value: 60, suffix: '+', label: { fr: 'étudiants formés', en: 'students trained' }, todo: true },
     { value: 180, suffix: ' t', label: { fr: 'de CO₂ évitées / an', en: 'CO₂ avoided / year' }, todo: true },
   ],
