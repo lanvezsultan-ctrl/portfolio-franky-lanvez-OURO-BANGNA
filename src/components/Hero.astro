@@ -18,24 +18,14 @@ const word = `${hero.marquee} — `;
     <div class="track"><span>{word}</span><span>{word}</span></div>
   </div>
 
-  <div class="portrait">
-    {photo ? (
+  {photo && (
+    <div class="portrait">
       <Picture src={photo} alt={hero.photoAlt[lang]} widths={[360, 560, 760]} sizes="(min-width: 900px) 520px, 90vw"
         formats={['avif', 'webp']} loading="eager" fetchpriority="high" />
-    ) : (
-      <div class="silhouette" role="img" aria-label={ui.photoSoon[lang]}>
-        <svg viewBox="0 0 400 460" aria-hidden="true">
-          <ellipse cx="200" cy="138" rx="66" ry="80" />
-          <path d="M172 200h56v52h-56z" />
-          <path d="M30 460c4-118 62-200 170-210 108 10 166 92 170 210z" />
-          <path class="tie" d="M190 252h20l-5 26 12 112-17 20-17-20 12-112z" />
-        </svg>
-        <span class="mono">{ui.photoSoon[lang]}</span>
-      </div>
-    )}
-  </div>
+    </div>
+  )}
 
-  <div class="container overlay">
+  <div class:list={['container overlay', { centered: !photo }]}>
     <div class="intro" data-reveal>
       <p class="eyebrow">{hero.hello[lang]}</p>
       <h1>{hero.firstName} <span>{hero.lastName}</span></h1>
@@ -66,10 +56,11 @@ const word = `${hero.marquee} — `;
   .portrait { position: absolute; left: 50%; bottom: 0; translate: -50% 0; width: min(92vw, 560px); height: min(82svh, 760px); z-index: 1;
     display: flex; align-items: flex-end; justify-content: center; }
   .portrait :global(picture), .portrait :global(img) { height: 100%; width: auto; object-fit: contain; object-position: bottom; }
-  .silhouette { position: relative; height: 88%; aspect-ratio: 400 / 460; display: grid; }
-  .silhouette svg { width: 100%; height: 100%; fill: color-mix(in srgb, var(--text) 16%, var(--bg)); }
-  .silhouette .tie { fill: color-mix(in srgb, var(--text) 30%, var(--bg)); }
-  .silhouette span { position: absolute; left: 50%; bottom: 12%; translate: -50% 0; white-space: nowrap; color: var(--muted); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; }
+  /* sans portrait : carte de présentation centrée sur le nom qui défile */
+  .overlay.centered { align-self: center; display: flex; justify-content: center; padding-top: 5rem; }
+  .centered .intro { max-width: 460px; text-align: center; padding: 1.6rem 1.8rem; }
+  .centered h1 { font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem); }
+  .centered .actions { justify-content: center; }
 
   .overlay { position: relative; z-index: 2; align-self: end; padding-bottom: clamp(1.5rem, 5vh, 3rem); pointer-events: none; }
   .intro { pointer-events: auto; max-width: 340px; padding: 1.1rem 1.2rem; border-radius: var(--radius);
